@@ -80,20 +80,7 @@ export async function getUserById(
 export async function createUser(
     userData: CreateUserInput['body'] | Prisma.UserCreateInput
 ): Promise<User> {
-    const existingUsers = await findUsers({ email: userData.email });
-
-    if (existingUsers.length > 0){
-        throw new Error('User with this email already exists.');
-    }
-
-    const hashedPassword = await hashPassword(userData.password as string);
-
-    const dataToCreate = {
-        ...userData,
-        password: hashedPassword,
-    } as Prisma.UserCreateInput
-
-    const user: User = await prisma.user.create({data: dataToCreate});
+    const user: User = await prisma.user.create({data: userData});
     return user;
 }
 
