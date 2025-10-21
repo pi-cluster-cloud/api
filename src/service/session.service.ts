@@ -8,14 +8,14 @@ import jwt from 'jsonwebtoken';
  * Creates a new session (login)
  * 
  * @param loginData {CreateSessionInput['body']} - Login data containing (`email` or `phoneNumber`) and `password`
- * @param userClient {string} - Client from which the login request was made
+ * @param userClient {string} - Client from which the login request was made (optional)
  * @returns Promise<Session | null> - The created session if login was valid, null otherwise
  */
 export async function createSession(
     loginData: CreateSessionInput['body'],
     userClient?: string
 ): Promise<Session | null> {
-    const user: Partial<User> | null = await validateLogin(loginData);
+    const user: User | null = await validateLogin(loginData);
     if (!user) return null; // Invalid login
 
     const newSession: Session = await prisma.session.create({

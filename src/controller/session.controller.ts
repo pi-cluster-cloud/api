@@ -28,10 +28,7 @@ export async function createSessionHandler(
         }
 
         // Get user
-        const user: Partial<User> | null = await getUserById({
-            userId: newSession.user,
-            select: {role: true}
-        });
+        const user: User | null = await getUserById(newSession.user);
 
         // Sign access token
         const payload: object = {
@@ -46,6 +43,11 @@ export async function createSessionHandler(
                 expiresIn: config.get<number>('accessTokenTtl')
             }
         );
+        if (!accessToken) {
+            return res.status(500).send({
+                message: 'Internal server error occured'
+            });
+        }
 
         return res.status(201).send(accessToken);
 }
