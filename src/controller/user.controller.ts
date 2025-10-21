@@ -72,10 +72,7 @@ export async function getUserHandler(
     res: Response,
 ): Promise<Response> {
     try {
-        // Find user with params.userId
-        const user: Partial<User> | null = await getUserById({
-            userId: Number(req.params.userId)
-        })
+        const user: User | null = await getUserById(Number(req.params.userId));
 
         if (!user) {
             return res.status(404).send({

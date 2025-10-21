@@ -47,7 +47,7 @@ export async function findUsers(
  */
 export async function getUserById(
     userId: number
-): Promise<Partial<User> | null> {
+): Promise<User | null> {
     const select: Prisma.UserSelect = {
         id: true,
         email: true,
@@ -80,20 +80,7 @@ export async function getUserById(
 export async function createUser(
     userData: CreateUserInput['body'] | Prisma.UserCreateInput
 ): Promise<User> {
-    const existingUsers = await findUsers({ email: userData.email });
-
-    if (existingUsers.length > 0){
-        throw new Error('User with this email already exists.');
-    }
-
-    const hashedPassword = await hashPassword(userData.password as string);
-
-    const dataToCreate = {
-        ...userData,
-        password: hashedPassword,
-    } as Prisma.UserCreateInput
-
-    const user: User = await prisma.user.create({data: dataToCreate});
+    const user: User = await prisma.user.create({data: userData});
     return user;
 }
 
@@ -121,14 +108,15 @@ export async function hashPassword(password: string): Promise<string> {
 export async function validateLogin(
     loginData: CreateSessionInput['body']
 ): Promise<User | null> {
-    const users: User[] = await findUsers(omit(loginData, 'password'));
-    console.log(users);
-    if (!users.length) return null;
+    const user: User | null = await prisma.user.findUnique({
+        where: omit(loginData, 'password') as Prisma.UserWhereUniqueInput
+    });
 
-    for (const user of users) {
-        if (await bcrypt.compare(loginData.password, user.password as string)) {
-            return user;
-        }
+    if (!user) return null;
+
+    if (await bcrypt.compare(loginData.password, user.password as string)) {
+        return user;
     }
+    
     return null;
 }

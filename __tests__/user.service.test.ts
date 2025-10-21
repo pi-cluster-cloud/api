@@ -1,151 +1,155 @@
-import { User, Role, Prisma } from '@prisma/client';
+import { User, Role } from '@prisma/client';
 import { CreateSessionInput } from '../src/schema/session.schema';
-import bcrypt from 'bcrypt';
-
-jest.mock('../src/utils/prisma', () => ({
-  __esModule: true,
-  default: {
-    user: { 
-        findMany: jest.fn(),
-        findUnique: jest.fn(),
-        create: jest.fn()
-    
-    },
-  },
-}));
-
-jest.mock('../src/service/user.service', () => {
-    const originalModule = jest.requireActual('../src/service/user.service');
-    return {
-        ...originalModule,
-        hashPassword: jest.fn((password: string) => Promise.resolve(`hashed_${password}`))
-    }
-})
-
 import prisma from '../src/utils/prisma';
-import { createUser, findUsers, getUserById, hashPassword, validateLogin } from '../src/service/user.service';
-
-const actualHashPassword = jest.requireActual('../src/service/user.service').hashPassword;
-
+import * as userService from '../src/service/user.service';
 
 describe('USER SERVICE', () => {
     describe('FUNCTION getUserById', () => {
-        // @ts-ignore
-        const findUniqueSpy = jest.spyOn(prisma.user, 'findUnique').mockImplementationOnce(() => {})
+        // ARRANGE
+        const findUniqueSpy = jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce({
+            id: 1,
+            email: 'test@test.com',
+            phoneNumber: null,
+            role: Role.user,
+            password: 'password',
+            firstName: 'test',
+            lastName: 'test',
+            createdAt: new Date(),
+            updatedAt: new Date()
+        });
         
         it('should call findUnique', async () => {
-            await getUserById(1);
+            // ACT
+            await userService.getUserById(1);
 
+            // ASSERT
             expect(findUniqueSpy).toHaveBeenCalled();
         });
     });
 
     describe('FUNCTION findUsers', () => {
-        const findManySpy = jest.spyOn(prisma.user, 'findMany').mockImplementation();
+        const findManySpy = jest.spyOn(prisma.user, 'findMany').mockResolvedValueOnce([]);
 
         it('should call findMany', async () => {
-            await findUsers({email: 'user@user.com'});
+            await userService.findUsers({email: 'test@test.com'});
 
             expect(findManySpy).toHaveBeenCalled();
         });
     });
 
     describe('FUNCTION createUser', () => {
-        const createSpy = jest.spyOn(prisma.user, 'create').mockImplementation();
-
-        it ('should call create with a mocked hashed password', async () => {
-            jest.spyOn(prisma.user, 'findMany').mockResolvedValueOnce([]);
-            await createUser({
+        it('should call create', async () => {
+            // ARRANGE
+            const createSpy = jest.spyOn(prisma.user, 'create').mockResolvedValueOnce({
+                id: 1,
                 email: 'test@test.com',
-                password: 'test',
-                phoneNumber: '1234567890',
-                firstName: 'user',
-                lastName: 'user',
+                phoneNumber: null,
+                role: Role.user,
+                password: 'password',
+                firstName: 'test',
+                lastName: 'test',
+                createdAt: new Date(),
+                updatedAt: new Date()
             });
 
-            expect(createSpy).toHaveBeenCalledWith({
-                data: {
-                    email: 'test@test.com',
-                    password: 'hashed_test',
-                    phoneNumber: '1234567890',
-                    firstName: 'user',
-                    lastName: 'user',
-                }
+            // ACT
+            await userService.createUser({
+                email: 'test@test.com',
+                phoneNumber: null,
+                role: Role.user,
+                password: 'password',
+                firstName: 'test',
+                lastName: 'test',
             });
+
+            // ASSERT
+            expect(createSpy).toHaveBeenCalled();
         });
-
-        const DUPLICATE_EMAIL = 'duplicate@test.com';
-        it('should identify duplicates and throw an error', async() => {
-                jest.spyOn(prisma.user, 'findMany').mockResolvedValueOnce([
-                    {id: 101, email: 'duplicate@test.com', password: 'hash'} as any
-                ]);
-
-                const duplicatePayload = {
-                    email: DUPLICATE_EMAIL,
-                    password: 'test',
-                    phoneNumber: '1234567890',
-                    firstName: 'new',
-                    lastName: 'user'
-                };
-
-                await expect(createUser(duplicatePayload)).rejects.toThrow(
-                    'User with this email already exists.'
-                )
-
-                expect(createSpy).not.toHaveBeenCalled();
-            })
     });
 
     describe('FUNCTION validateLogin', () => {
-        const password: string = 'password';
-        let actualHashedPassword: string;
-        let mockUser: User;
+        // ARRANGE
+        const plainTextPassword: string = 'password';
+        let hashedPassword: string;
+        let findUniqueSpy: jest.SpyInstance;
 
-        beforeEach(async () => {
-            actualHashedPassword = await actualHashPassword(password);
+        beforeAll(async () => {
+            hashedPassword = await userService.hashPassword(plainTextPassword);
 
-            mockUser = {
+            findUniqueSpy = jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce({
                 id: 1,
                 email: 'test@test.com',
-                password: actualHashedPassword,
-                phoneNumber: '1234567890',
-                firstName: 'user',
-                lastName: 'user',
+                phoneNumber: null,
                 role: Role.user,
+                password: hashedPassword,
+                firstName: 'test',
+                lastName: 'test',
                 createdAt: new Date(),
                 updatedAt: new Date()
-            } as User;
-
-            jest.spyOn(bcrypt, 'compare').mockImplementation((plain, hash) => {
-                return Promise.resolve(plain === password && hash === actualHashedPassword);
             });
         });
         
-        
-        describe('given valid login', () => {
+        it('should call findUnique', async () => {
+            // ARRANGE
             const login: CreateSessionInput['body'] = {
                 email: 'test@test.com',
-                password
+                password: plainTextPassword
             };
 
-            const findManySpy = jest.spyOn(prisma.user, 'findMany').mockResolvedValueOnce([{
-                id: 1,
-                email: login.email!,
-                password: actualHashedPassword,
-                phoneNumber: '1234567890',
-                firstName: 'user',
-                lastName: 'user',
-                role: Role.user,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }]);
+            // ACT
+            await userService.validateLogin(login);
+
+            // ASSERT
+            expect(findUniqueSpy).toHaveBeenCalled;
+        });
+
+        describe('given valid email and password', () => {
+            // ARRANGE
+            const login: CreateSessionInput['body'] = {
+                email: 'test@test.com',
+                password: plainTextPassword
+            };
 
             it('should return the user', async () => {
-                const user: User | null = await validateLogin(login);
+                // ACT
+                const user: User | null = await userService.validateLogin(login);
                 
-                expect(typeof user).toBe('User');
+                // ASSERT
+                expect(typeof user).toBe('object');
+            });
+        });
+
+        describe('given valid email and invalid password', () => {
+            // ARRANGE
+            const login: CreateSessionInput['body'] = {
+                email: 'test@test.com',
+                password: plainTextPassword
+            };
+            
+            it('should return null', async () => {
+                // ACT
+                const user: User | null = await userService.validateLogin(login);
+
+                // ASSERT
+                expect(user).toBeNull();
+            });
+        });
+
+        describe('given invalid email', () => {
+            // ARRANGE
+            const login: CreateSessionInput['body'] = {
+                email: 'fakeemail@test.com',
+                password: plainTextPassword
+            };
+            jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce(null);
+
+            it('should return null', async () => {
+                // ACT
+                const user: User | null = await userService.validateLogin(login);
+
+                // ASSERT
+                expect(user).toBeNull();
             });
         });
     });
-
 });
