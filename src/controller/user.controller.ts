@@ -72,10 +72,14 @@ export async function getUserHandler(
     res: Response,
 ): Promise<Response> {
     try {
-        // Find user with params.userId
-        const user: Partial<User> | null = await getUserById({
-            userId: Number(req.params.userId)
-        })
+        if (Number(req.params.userId) !== res.locals.user.id) {
+            // If requested user does not match accessToken
+            return res.status(403).send({
+                message: 'You do not have permission to view this resource'
+            });
+        }
+
+        const user: User | null = await getUserById(Number(req.params.userId));
 
         if (!user) {
             return res.status(404).send({
