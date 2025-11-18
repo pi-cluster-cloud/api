@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">41.5% </span>
+                <span class="strong">67.92% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>22/53</span>
+                <span class='fraction'>36/53</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>1/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">41.5% </span>
+                <span class="strong">67.92% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>22/53</span>
+                <span class='fraction'>36/53</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -152,22 +152,22 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Prisma, Session, User } from "@prisma/client";
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { Prisma, Session, User } from "@prisma/client";
 import { CreateSessionInput } from "../schema/session.schema";
 import prisma from "../utils/prisma";
 import { validateLogin } from "./user.service";
@@ -204,29 +204,29 @@ import jwt from 'jsonwebtoken';
  * @returns {string | null} - Signed JWT or null if an error occured
  * 
  */
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >export function signJWT(payload: object, options: jwt.SignOptions): string | null {</span></span>
-<span class="cstat-no" title="statement not covered" >    const secret: string | undefined = process.env.JWT_SECRET;</span>
-<span class="cstat-no" title="statement not covered" >    if (!secret) return null;</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >        const token: string = jwt.sign(</span>
-<span class="cstat-no" title="statement not covered" >            payload,</span>
-<span class="cstat-no" title="statement not covered" >            secret,</span>
-<span class="cstat-no" title="statement not covered" >            options</span>
-<span class="cstat-no" title="statement not covered" >        );</span>
-<span class="cstat-no" title="statement not covered" >        return token;</span>
-<span class="cstat-no" title="statement not covered" >    }</span>
-<span class="cstat-no" title="statement not covered" >    catch (err: unknown) {</span>
+export function signJWT(payload: object, options: jwt.SignOptions): string | null {
+    const secret: string | undefined = process.env.JWT_SECRET;
+    if (!secret) <span class="branch-0 cbranch-no" title="branch not covered" >return null;</span>
+&nbsp;
+    try {
+        const token: string = jwt.sign(
+            payload,
+            secret,
+            options
+        );
+        return token;
+    }
+<span class="branch-0 cbranch-no" title="branch not covered" >    catch (err: unknown) {</span>
 <span class="cstat-no" title="statement not covered" >        return null;</span>
 <span class="cstat-no" title="statement not covered" >    }</span>
-<span class="cstat-no" title="statement not covered" >}</span></pre></td></tr></table></pre>
+}</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-27T15:25:21.760Z
+                at 2025-11-18T00:11:20.514Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
