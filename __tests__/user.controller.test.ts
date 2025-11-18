@@ -4,6 +4,9 @@ import supertest from 'supertest';
 import { CreateUserInput } from '../src/schema/user.schema';
 import createServer from '../src/utils/create_server';
 
+jest.mock('../src/middleware/require_user');
+import { requireUser } from '../src/middleware/require_user';
+
 const app = createServer();
 
 describe('USER CONTROLLER', () => {
@@ -66,46 +69,61 @@ describe('USER CONTROLLER', () => {
     describe('ROUTE GET /api/users/:userId', () => {
         const ENDPOINT = (userId: string): string => `/api/users/${userId}`;
 
-        describe('given an existing userId', () => {
-            // ARRANGE
-            let getUserByIdSpy: jest.SpyInstance;
-            beforeEach(() => {
-                getUserByIdSpy = jest.spyOn(userService, 'getUserById').mockResolvedValueOnce({
+        describe('given the user is logged in', () => {
+            // Bypass requireUser
+            (requireUser as jest.Mock).mockImplementation((req, res, next) => {
+                res.locals.user = {
+                    id: 1,
                     email: 'test@test.com',
-                    password: 'password',
                     firstName: 'test',
                     lastName: 'test',
-                    id: 1,
-                    phoneNumber: null,
                     role: Role.user,
                     createdAt: new Date(),
-                    updatedAt: new Date()
+                    updatedAt: new Date(),
+                    session: 1
+                };
+                next();
+            });
+
+            describe('given an existing userId', () => {
+                // ARRANGE
+                beforeEach(() => {
+                    jest.spyOn(userService, 'getUserById').mockResolvedValueOnce({
+                        email: 'test@test.com',
+                        password: 'password',
+                        firstName: 'test',
+                        lastName: 'test',
+                        id: 1,
+                        phoneNumber: null,
+                        role: Role.user,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    });
+                });
+
+                it('should return status 200', async () => {
+                    // ACT
+                    const result: number = (await supertest(app).get(ENDPOINT('1')))
+                    .statusCode;
+
+                    // ASSERT
+                    expect(result).toBe(200);
                 });
             });
+            describe('given a nonexistent userId', () => {
+                // ARRANGE
+                beforeEach(() => {
+                    jest.spyOn(userService, 'getUserById').mockResolvedValueOnce(null);
+                });
 
-            it('should return status 200', async () => {
-                // ACT
-                const result: number = (await supertest(app).get(ENDPOINT('1')))
-                .statusCode;
+                it('should return status 404', async () => {
+                    // ACT
+                    const result: number = (await supertest(app).get(ENDPOINT('1')))
+                    .statusCode;
 
-                // ASSERT
-                expect(result).toBe(200);
-            });
-        });
-        describe('given a nonexistent userId', () => {
-            // ARRANGE
-            let getUserByIdSpy: jest.SpyInstance;
-            beforeEach(() => {
-                getUserByIdSpy = jest.spyOn(userService, 'getUserById').mockResolvedValueOnce(null);
-            });
-
-            it('should return status 404', async () => {
-                // ACT
-                const result: number = (await supertest(app).get(ENDPOINT('1')))
-                .statusCode;
-
-                // ASSERT
-                expect(result).toBe(404);
+                    // ASSERT
+                    expect(result).toBe(404);
+                });
             });
         });
     });
