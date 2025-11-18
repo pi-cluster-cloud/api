@@ -50,9 +50,8 @@ export async function findUsers(
  * @param {Prisma.UserSelect} select - Properties of the user to select (optional, defaults to all fields).
  * @returns {Promise<Partial<User> | null>} The found user or `null` if no user exists.
  */
-export async function getUserById({
-    userId,
-    select = {
+export async function getUserById(userId: number): Promise<User | null> {
+    const select: Prisma.UserSelect = {
         id: true,
         email: true,
         phoneNumber: true,
@@ -61,13 +60,7 @@ export async function getUserById({
         role: true,
         createdAt: true,
         updatedAt: true,
-    }
-}: {
-    userId: number,
-    select?: Prisma.UserSelect
-}
-    
-): Promise<Partial<User> | null> {
+    };
     const user: User | null = await prisma.user.findUnique({
         select,
         where: {id: userId}

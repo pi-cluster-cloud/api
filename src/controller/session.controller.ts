@@ -2,10 +2,11 @@ import {Response} from 'express';
 import { TypedRequest } from '../utils/typed_request';
 import { CreateSessionInput } from '../schema/session.schema';
 import { Session, User } from '@prisma/client';
-import { createSession, signJWT } from '../service/session.service';
+import { createSession, signJwt } from '../service/session.service';
 import { getUserById } from '../service/user.service';
 import config from 'config';
 import {Algorithm} from 'jsonwebtoken';
+import { omit } from 'lodash';
 
 /**
  * Handler for creating a session (logging in)
@@ -28,24 +29,36 @@ export async function createSessionHandler(
         }
 
         // Get user
-        const user: Partial<User> | null = await getUserById({
-            userId: newSession.user,
-            select: {role: true}
-        });
+        const user: User | null = await getUserById(newSession.user);
 
         // Sign access token
         const payload: object = {
-            user: newSession.user,
-            session: newSession.id,
-            role: user!.role
+            ...omit(user, 'password'),
+            session: newSession.id
         };
-        const accessToken: string | null = signJWT(
+        const accessToken: string | null = signJwt(
             payload,
             {
                 algorithm: config.get<Algorithm>('jwtAlgorithm'),
                 expiresIn: config.get<number>('accessTokenTtl')
             }
         );
+        const refreshToken: string | null = signJwt(
+            payload,
+            {
+                algorithm: config.get<Algorithm>('jwtAlgorithm'),
+                expiresIn: config.get<number>('refreshTokenTtl')
+            }
+        );
 
-        return res.status(201).send(accessToken);
+        if (!accessToken) {
+            return res.status(500).send({
+                message: 'Internal server error occured'
+            });
+        }
+
+        return res.status(201).send({
+            accessToken,
+            refreshToken
+        });
 }
