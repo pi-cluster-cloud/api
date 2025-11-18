@@ -40,13 +40,14 @@ describe('SESSION CONTROLLER', () => {
                 });
             });
 
-            it('should return status 201 with an access token', async () => {
+            it('should return status 201 with an access and refresh token', async () => {
                 // ACT
                 const result = (await supertest(app).post(ENDPOINT).send(sessionInput));
 
                 // ASSERT
                 expect(result.statusCode).toBe(201);
-                expect(typeof result.text).toBe('string'); // Change to body when refresh tokens added
+                expect(typeof result.body?.accessToken).toBe('string');
+                expect(typeof result.body?.refreshToken).toBe('string');
             });
         });
         describe('given an invalid login', () => {
