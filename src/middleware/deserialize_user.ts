@@ -20,7 +20,7 @@ export default async function deserializeUser(req: Request, res: Response, next:
     if (Array.isArray(refreshToken)) {
         refreshToken = refreshToken[0];
     }
-
+    
     const verified: VerifyJwtResult | null = verifyJwt(accessToken);
     if (!verified) {
         // Unable to verify JWT due to server error
