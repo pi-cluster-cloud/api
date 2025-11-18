@@ -23,30 +23,54 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
+<<<<<<< HEAD
                 <span class="strong">42.06% </span>
                 <span class="quiet">Statements</span>
                 <span class='fraction'>61/145</span>
+=======
+                <span class="strong">67.92% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>36/53</span>
+>>>>>>> feature/0.1.0-unit-tests
             </div>
         
             
             <div class='fl pad1y space-right2'>
+<<<<<<< HEAD
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
                 <span class='fraction'>3/3</span>
+=======
+                <span class="strong">33.33% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/3</span>
+>>>>>>> feature/0.1.0-unit-tests
             </div>
         
             
             <div class='fl pad1y space-right2'>
+<<<<<<< HEAD
                 <span class="strong">20% </span>
                 <span class="quiet">Functions</span>
                 <span class='fraction'>1/5</span>
+=======
+                <span class="strong">50% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/2</span>
+>>>>>>> feature/0.1.0-unit-tests
             </div>
         
             
             <div class='fl pad1y space-right2'>
+<<<<<<< HEAD
                 <span class="strong">42.06% </span>
                 <span class="quiet">Lines</span>
                 <span class='fraction'>61/145</span>
+=======
+                <span class="strong">67.92% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>36/53</span>
+>>>>>>> feature/0.1.0-unit-tests
             </div>
         
             
@@ -61,7 +85,11 @@
             </div>
         </template>
     </div>
+<<<<<<< HEAD
     <div class='status-line low'></div>
+=======
+    <div class='status-line medium'></div>
+>>>>>>> feature/0.1.0-unit-tests
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -115,6 +143,7 @@
 <a name='L50'></a><a href='#L50'>50</a>
 <a name='L51'></a><a href='#L51'>51</a>
 <a name='L52'></a><a href='#L52'>52</a>
+<<<<<<< HEAD
 <a name='L53'></a><a href='#L53'>53</a>
 <a name='L54'></a><a href='#L54'>54</a>
 <a name='L55'></a><a href='#L55'>55</a>
@@ -208,6 +237,9 @@
 <a name='L143'></a><a href='#L143'>143</a>
 <a name='L144'></a><a href='#L144'>144</a>
 <a name='L145'></a><a href='#L145'>145</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+=======
+<a name='L53'></a><a href='#L53'>53</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+>>>>>>> feature/0.1.0-unit-tests
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -220,6 +252,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<<<<<<< HEAD
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -273,6 +306,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
+=======
+>>>>>>> feature/0.1.0-unit-tests
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -301,6 +336,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<<<<<<< HEAD
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -358,15 +394,37 @@ import { getUserById, validateLogin } from "./user.service";
 import jwt from 'jsonwebtoken';
 import { omit } from "lodash";
 import config from 'config';
+=======
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { Prisma, Session, User } from "@prisma/client";
+import { CreateSessionInput } from "../schema/session.schema";
+import prisma from "../utils/prisma";
+import { validateLogin } from "./user.service";
+import jwt from 'jsonwebtoken';
+>>>>>>> feature/0.1.0-unit-tests
 &nbsp;
 /**
  * Creates a new session (login)
  * 
+<<<<<<< HEAD
  * @async
+=======
+>>>>>>> feature/0.1.0-unit-tests
  * @param loginData {CreateSessionInput['body']} - Login data containing (`email` or `phoneNumber`) and `password`
  * @param userClient {string} - Client from which the login request was made (optional)
  * @returns Promise&lt;Session | null&gt; - The created session if login was valid, null otherwise
  */
+<<<<<<< HEAD
 export async function createSession(
     loginData: CreateSessionInput['body'],
     userClient?: string
@@ -407,6 +465,22 @@ export async function createSession(
 <span class="cstat-no" title="statement not covered" >        where: {id: sessionId}</span>
 <span class="cstat-no" title="statement not covered" >    });</span>
 <span class="cstat-no" title="statement not covered" >    return session;</span>
+=======
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >export async function createSession(</span></span>
+<span class="cstat-no" title="statement not covered" >    loginData: CreateSessionInput['body'],</span>
+<span class="cstat-no" title="statement not covered" >    userClient?: string</span>
+<span class="cstat-no" title="statement not covered" >): Promise&lt;Session | null&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    const user: User | null = await validateLogin(loginData);</span>
+<span class="cstat-no" title="statement not covered" >    if (!user) return null; // Invalid login</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    const newSession: Session = await prisma.session.create({</span>
+<span class="cstat-no" title="statement not covered" >        data: {</span>
+<span class="cstat-no" title="statement not covered" >            user: user.id as number,</span>
+<span class="cstat-no" title="statement not covered" >            userClient,</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" >    });</span>
+<span class="cstat-no" title="statement not covered" >    return newSession;</span>
+>>>>>>> feature/0.1.0-unit-tests
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
 /**
@@ -415,6 +489,7 @@ export async function createSession(
  * @param payload {object} - Payload to be signed
  * @param options {jwt.SignOptions} - Options for signing behavior
  * @returns {string | null} - Signed JWT or null if an error occured
+<<<<<<< HEAD
  */
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >export function signJwt(payload: object, options: jwt.SignOptions): string | null {</span></span>
 <span class="cstat-no" title="statement not covered" >    const secret: string | undefined = process.env.JWT_SECRET;</span>
@@ -496,13 +571,37 @@ export type VerifyJwtResult = {
 <span class="cstat-no" title="statement not covered" >    </span>
 <span class="cstat-no" title="statement not covered" >    return accessToken;</span>
 <span class="cstat-no" title="statement not covered" >}</span></pre></td></tr></table></pre>
+=======
+ * 
+ */
+export function signJWT(payload: object, options: jwt.SignOptions): string | null {
+    const secret: string | undefined = process.env.JWT_SECRET;
+    if (!secret) <span class="branch-0 cbranch-no" title="branch not covered" >return null;</span>
+&nbsp;
+    try {
+        const token: string = jwt.sign(
+            payload,
+            secret,
+            options
+        );
+        return token;
+    }
+<span class="branch-0 cbranch-no" title="branch not covered" >    catch (err: unknown) {</span>
+<span class="cstat-no" title="statement not covered" >        return null;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+}</pre></td></tr></table></pre>
+>>>>>>> feature/0.1.0-unit-tests
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+<<<<<<< HEAD
                 at 2025-10-21T16:42:07.708Z
+=======
+                at 2025-11-18T00:11:20.514Z
+>>>>>>> feature/0.1.0-unit-tests
             </div>
         <script src="../../prettify.js"></script>
         <script>
