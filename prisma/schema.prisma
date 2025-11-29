@@ -26,6 +26,7 @@ model User {
     updatedAt DateTime @updatedAt @map("updated_at")
 
     sessions Session[]
+    files File[]
     @@map("users")
 }
 
@@ -44,4 +45,19 @@ model Session {
 enum Role {
     user
     admin
+}
+
+model File {
+    id Int @id @default(autoincrement())
+    filename String @db.VarChar(255)
+    mimeType String @db.VarChar(127) @map("mime_type")
+    size BigInt
+    path String @db.VarChar(512)
+    user Int
+    uploadedAt DateTime @default(now()) @map("uploaded_at")
+    
+    userRef User @relation(fields: [user], references: [id])
+    
+    @@index([user])
+    @@map("files")
 }
