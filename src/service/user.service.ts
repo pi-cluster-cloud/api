@@ -10,32 +10,27 @@ import { omit } from 'lodash';
  * Finds all users of given format matching given properties
  * 
  * @async
- * @param {Primsa.UserSelect} select - Properties of the user to select (optional, defaults to all properties)
  * @param {Prisma.UserWhereUniqueInput} where - Properties to search for
- * @returns {Promise<Partial<User>[]>} - Found users reduced to only fields in where
+ * @returns {Promise<User[]>} - Found users reduced to only fields in where
  */
 export async function findUsers(
-    {
-        select = {
-            id: true,
-            email: true,
-            phoneNumber: true,
-            firstName: true,
-            lastName: true,
-            role: true,
-            createdAt: true,
-            updatedAt: true,
-        },
-        where
-    }: {
-        select?: Prisma.UserSelect;
-        where: SearchUsersInput['query'] | Prisma.UserWhereUniqueInput;
+    where: SearchUsersInput['query'] | Prisma.UserWhereUniqueInput
+): Promise<User[]> {
+    const select: Prisma.UserSelect = {
+        id: true,
+        email: true,
+        phoneNumber: true,
+        password: true,
+        role: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true
     }
-): Promise<Partial<User>[]> {
     if (where.id) {
         where.id = Number(where.id); // Ensure id is number
     }
-    const users: Partial<User>[] = await prisma.user.findMany({
+    const users: User[] = await prisma.user.findMany({
         select,
         where: where as Prisma.UserWhereUniqueInput
     });
@@ -48,26 +43,20 @@ export async function findUsers(
  * @async
  * @param {number} userId - The `id` of the user to be retrieved.
  * @param {Prisma.UserSelect} select - Properties of the user to select (optional, defaults to all fields).
- * @returns {Promise<Partial<User> | null>} The found user or `null` if no user exists.
+ * @returns {Promise<User | null>} The found user or `null` if no user exists.
  */
-export async function getUserById({
-    userId,
-    select = {
+export async function getUserById(userId: number): Promise<User | null> {
+    const select: Prisma.UserSelect = {
         id: true,
         email: true,
         phoneNumber: true,
+        password: true,
         firstName: true,
         lastName: true,
         role: true,
         createdAt: true,
         updatedAt: true,
-    }
-}: {
-    userId: number,
-    select?: Prisma.UserSelect
-}
-    
-): Promise<Partial<User> | null> {
+    };
     const user: User | null = await prisma.user.findUnique({
         select,
         where: {id: userId}
@@ -115,17 +104,16 @@ export async function hashPassword(password: string): Promise<string> {
  */
 export async function validateLogin(
     loginData: CreateSessionInput['body']
-): Promise<Partial<User> | null> {
-    const users: Partial<User>[] = await findUsers({
-        select: {id: true, password: true},
-        where: omit(loginData, 'password')
+): Promise<User | null> {
+    const user: User | null = await prisma.user.findUnique({
+        where: omit(loginData, 'password') as Prisma.UserWhereUniqueInput
     });
-    if (!users.length) return null;
 
-    for (const user of users) {
-        if (await bcrypt.compare(loginData.password, user.password as string)) {
-            return omit(user, 'password');
-        }
+    if (!user) return null;
+
+    if (await bcrypt.compare(loginData.password, user.password as string)) {
+        return user;
     }
+    
     return null;
 }
