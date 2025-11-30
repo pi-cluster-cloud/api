@@ -1,8 +1,9 @@
 import { Response, Request } from 'express';
-import { saveFile, getFileById, getFilesByUserId, readFile, deleteFile } from '../service/file.service';
+import { saveFile, getFileById, getFilesByUserId, readFile, deleteFile, findFiles } from '../service/file.service';
 import { Prisma, File } from '@prisma/client';
 import { TypedRequest } from '../utils/typed_request';
 import { GetFileInput, GetUserFilesInput, DeleteFileInput } from '../schema/file.schema';
+import { omit } from 'lodash';
 
 /**
  * Handles the upload of a new file
@@ -14,6 +15,7 @@ import { GetFileInput, GetUserFilesInput, DeleteFileInput } from '../schema/file
  * @returns {Promise<Response>} Returns an HTTP response:
  * - `201` with the newly created file record on success
  * - `400` if no file is uploaded
+ * - `409` if file with same name already exists
  * - `500` for file system or database errors
  */
 export async function uploadFileHandler(
@@ -21,6 +23,7 @@ export async function uploadFileHandler(
     res: Response
 ): Promise<Response> {
     try {
+        // No file sent
         if (!req.file) {
             return res.status(400).send({
                 message: 'File is required'
@@ -28,20 +31,28 @@ export async function uploadFileHandler(
         }
 
         const userId: number = res.locals.user.id;
+        
+        // Check if user already has a file with this name
+        const existingFiles: File[] = await findFiles({
+            user: userId,
+            fileName: req.file.originalname
+        });
+
+        if (existingFiles.length) {
+            return res.status(409).send({
+                message: 'File with this name already exists'
+            });
+        }
+
         const file: File = await saveFile(userId, req.file);
 
         return res.status(201).send({
             message: 'File uploaded successfully',
-            file: {
-                id: file.id,
-                filename: file.filename,
-                mimeType: file.mimeType,
-                size: file.size.toString(),
-                uploadedAt: file.uploadedAt
-            }
+            file: omit(file, 'path', 'user', 'size')
         });
     }
     catch (err: unknown) {
+        console.log(err);
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
             return res.status(400).send({
                 message: 'Database error occurred'
@@ -90,7 +101,7 @@ export async function downloadFileHandler(
         const fileBuffer: Buffer = await readFile(file.path);
 
         res.setHeader('Content-Type', file.mimeType);
-        res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
+        res.setHeader('Content-Disposition', `attachment; filename="${file.fileName}"`);
         return res.send(fileBuffer);
     }
     catch (err: unknown) {
@@ -136,7 +147,7 @@ export async function getUserFilesHandler(
         return res.status(200).send({
             files: files.map(file => ({
                 id: file.id,
-                filename: file.filename,
+                filename: file.fileName,
                 mimeType: file.mimeType,
                 size: file.size.toString(),
                 uploadedAt: file.uploadedAt

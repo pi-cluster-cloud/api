@@ -49,7 +49,7 @@ enum Role {
 
 model File {
     id Int @id @default(autoincrement())
-    filename String @db.VarChar(255)
+    fileName String @db.VarChar(255)
     mimeType String @db.VarChar(127) @map("mime_type")
     size BigInt
     path String @db.VarChar(512)

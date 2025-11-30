@@ -18,7 +18,7 @@ export async function saveFile(
     userId: number,
     file: Express.Multer.File
 ): Promise<File> {
-    const baseDir: string = config.get<string>('fileStorage.basePath');
+    const baseDir: string = config.get<string>('fileStorage.saveDirectory');
     const userDir: string = path.join(baseDir, userId.toString());
     
     // Ensure user directory exists
@@ -33,7 +33,7 @@ export async function saveFile(
     // Create database record
     const fileRecord: File = await prisma.file.create({
         data: {
-            filename: file.originalname,
+            fileName: file.originalname,
             mimeType: file.mimetype,
             size: BigInt(file.size),
             path: filePath,
@@ -72,6 +72,23 @@ export async function getFileById(fileId: number): Promise<File | null> {
     });
     
     return file;
+}
+
+/**
+ * Finds all files matching given properties
+ * 
+ * @async
+ * @param {Prisma.FileWhereInput} where - Properties to search for
+ * @returns {Promise<File[]>} - Found files matching criteria
+ */
+export async function findFiles(
+    where: Prisma.FileWhereInput
+): Promise<File[]> {
+    const files: File[] = await prisma.file.findMany({
+        where
+    });
+    
+    return files;
 }
 
 /**
