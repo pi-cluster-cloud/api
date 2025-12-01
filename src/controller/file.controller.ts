@@ -1,9 +1,10 @@
 import { Response, Request } from 'express';
-import { saveFile, getFileById, getFilesByUserId, readFile, deleteFile, findFiles } from '../service/file.service';
+import { saveFile, getFileById, getFilesByUserId, readFile, deleteFile, findFiles, searchFiles } from '../service/file.service';
 import { Prisma, File } from '@prisma/client';
 import { TypedRequest } from '../utils/typed_request';
 import { GetFileInput, GetUserFilesInput, DeleteFileInput } from '../schema/file.schema';
 import { omit } from 'lodash';
+import prisma from '../utils/prisma';
 
 /**
  * Handles the upload of a new file
@@ -24,31 +25,20 @@ export async function uploadFileHandler(
 ): Promise<Response> {
     try {
         // No file sent
-        if (!req.file) {
+        const file: Express.Multer.File | undefined = req.file;
+        if (!file) {
             return res.status(400).send({
                 message: 'File is required'
             });
         }
 
         const userId: number = res.locals.user.id;
-        
-        // Check if user already has a file with this name
-        const existingFiles: File[] = await findFiles({
-            user: userId,
-            fileName: req.file.originalname
-        });
 
-        if (existingFiles.length) {
-            return res.status(409).send({
-                message: 'File with this name already exists'
-            });
-        }
-
-        const file: File = await saveFile(userId, req.file);
+        const newFile: File = await saveFile(userId, file);
 
         return res.status(201).send({
             message: 'File uploaded successfully',
-            file: omit(file, 'path', 'user', 'size')
+            newFile: omit(file, 'path', 'user', 'size')
         });
     }
     catch (err: unknown) {
